@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Forbidden Zone</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --text: #ffffff;
+      --accent: #ff00cc;
+      --btn-bg: transparent;
+    }
+
+    [data-theme='light'] {
+      --bg: #ffffff;
+      --text: #111111;
+      --accent: #ff1493;
+      --btn-bg: #f5f5f5;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Raleway', sans-serif;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.4em;
+      margin-bottom: 20px;
+      animation: glitch 2s infinite;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 2px var(--accent), -2px -2px cyan; }
+      50% { text-shadow: -2px 2px lime, 2px -2px var(--accent); }
+      100% { text-shadow: 2px -2px cyan, -2px 2px var(--accent); }
+    }
+
+    #introText {
+      max-width: 600px;
+      font-size: 1.1em;
+      margin: 10px;
+      border-right: 2px solid var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+    }
+
+    button {
+      background: var(--btn-bg);
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: 0.3s;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background: var(--accent);
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .hidden { display: none; }
+
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+      color: var(--accent);
+      font-size: 1.2em;
+    }
+
+    .footer {
+      margin-top: 50px;
+      font-size: 0.85em;
+      color: gray;
+    }
+
+    .toggle-buttons {
+      position: absolute;
+      top: 20px;
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      max-width: 400px;
+      z-index: 10;
+    }
+
+    .follow-section {
+      margin-top: 40px;
+    }
+
+    .follow-text {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      color: var(--accent);
+    }
+
+    .follow-btn {
+      font-size: 1.5em;
+      color: var(--accent);
+      transition: transform 0.3s ease;
+    }
+
+    .follow-btn:hover {
+      transform: scale(1.2);
+      color: #00ffcc;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    #scoreBoard {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      font-size: 1em;
+      color: var(--accent);
+      background: rgba(0,0,0,0.4);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.9em; }
+      p { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Particle Background -->
+  <canvas id="starCanvas"></canvas>
+
+  <!-- Top Toggles -->
+  <div class="toggle-buttons">
+    <button onclick="toggleMode()">🌙 / ☀️</button>
+    <button onclick="toggleMusic()">🎵 Music</button>
+  </div>
+
+  <!-- Score Board -->
+  <div id="scoreBoard">Score: 0</div>
+
+  <!-- Main Header -->
+  <h1>You have arrived where arrival is forbidden.</h1>
+  <p id="introText">This is not just a page. It's a feeling, a vibe, a moment you weren’t supposed to experience… yet here you are.</p>
+
+  <!-- Buttons -->
+  <button onclick="showAffirmation()">Compliment</button>
+  <button onclick="showQuote()">Mystery Quote</button>
+  <button onclick="showRiddle()">Riddle</button>
+  <button onclick="showSecret()">Unlock Secret</button>
+
+  <!-- Message Containers -->
+  <div class="message hidden" id="affirmationBox"></div>
+  <div class="message hidden" id="quoteBox"></div>
+  <div class="message hidden" id="riddleBox"></div>
+  <div class="message hidden" id="riddleResult"></div>
+  <div class="message hidden" id="secretBox">✨ You are one of the rarest souls to ever exist ✨</div>
+  <div class="message hidden" id="codeBox">🔥 You unlocked the hidden code! Welcome, chosen one. 🔥</div>
+
+  <!-- Follow Me -->
+  <div class="follow-section">
+    <div class="follow-text">Follow me to continue the mystery 🌌</div>
+    <a href="https://instagram.com/zahid.1443" target="_blank" class="follow-btn">
+      <i class="fab fa-instagram"></i>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Made with curiosity in the void | © 2025
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/10/16/audio_77714822cd.mp3?filename=calm-lofi-ambient-117253.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- JavaScript -->
+  <script>
+    const affirmations = [
+      "You are beautiful. Inside and out.",
+      "You're not just good enough — you're incredible.",
+      "The world is lucky to have you.",
+      "Your presence changes everything.",
+      "You radiate magic, don't forget that.",
+      "You're rare. Like really rare.",
+      "You're enough. Always have been.",
+    ];
+
+    const quotes = [
+      "Not all who wander are lost. Some are just vibing.",
+      "You were never meant to fit in. You were born to stand out.",
+      "The quietest minds often hold the loudest thoughts.",
+      "You’re not here by accident. The void chose you.",
+      "In the end, we’re all just stories waiting to be told.",
+      "Reality is just a well-organized dream.",
+      "You’re exactly where you’re meant to be — even if it makes no sense."
+    ];
+
+    const riddles = [
+      {
+        question: "I speak without a mouth and hear without ears. What am I?",
+        options: ["A shadow", "An echo", "The wind", "A ghost"],
+        answer: "An echo"
+      },
+      {
+        question: "The more you take, the more you leave behind. What am I?",
+        options: ["Memories", "Footsteps", "Time", "Secrets"],
+        answer: "Footsteps"
+      },
+      {
+        question: "I’m always running but never move. What am I?",
+        options: ["Time", "A river", "Electricity", "Your thoughts"],
+        answer: "Time"
+      },
+      {
+        question: "What has to be broken before you can use it?",
+        options: ["Trust", "Glass", "An egg", "A promise"],
+        answer: "An egg"
+      },
+      {
+        question: "I’m not alive, but I can grow. What am I?",
+        options: ["Fire", "Crystal", "AI", "Mold"],
+        answer: "Fire"
+      }
+    ];
+
+    let score = 0;
+
+    function toggleMode() {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      document.documentElement.setAttribute("data-theme", currentTheme === "light" ? "dark" : "light");
+    }
+
+    function toggleMusic() {
+      const music = document.getElementById('bgMusic');
+      music.paused ? music.play() : music.pause();
+    }
+
+    function showAffirmation() {
+      const text = affirmations[Math.floor(Math.random() * affirmations.length)];
+      const box = document.getElementById("affirmationBox");
+      box.textContent = "💖 " + text;
+      box.classList.remove("hidden");
+    }
+
+    function showQuote() {
+      const text = quotes[Math.floor(Math.random() * quotes.length)];
+      const box = document.getElementById("quoteBox");
+      box.textContent = "🌀 " + text;
+      box.classList.remove("hidden");
+    }
+
+    function showRiddle() {
+      const riddle = riddles[Math.floor(Math.random() * riddles.length)];
+      const box = document.getElementById("riddleBox");
+      const resultBox = document.getElementById("riddleResult");
+
+      // Reset
+      box.innerHTML = "";
+      resultBox.textContent = "";
+      resultBox.classList.add("hidden");
+
+      // Show question
+      box.innerHTML = `❓ ${riddle.question}<br><br>`;
+      
+      // Add options
+      riddle.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt, riddle.answer);
+        box.appendChild(btn);
+      });
+
+      box.classList.remove("hidden");
+    }
+
+    function checkAnswer(selected, correct) {
+      const resultBox = document.getElementById("riddleResult");
+      resultBox.classList.remove("hidden");
+
+      if (selected === correct) {
+        score++;
+        updateScore();
+        const compliments = [
+          "🌟 Genius level unlocked!",
+          "🔥 Your brain is on fire (in a good way)!",
+          "💎 Rare mind detected!",
+          "🚀 You just solved it like a legend!",
+          "👑 Bow down, the riddle master has arrived!"
+        ];
+        resultBox.textContent = compliments[Math.floor(Math.random() * compliments.length)];
+        resultBox.style.color = "lime";
+      } else {
+        resultBox.textContent = "❌ Nope, try again!";
+        resultBox.style.color = "red";
+      }
+    }
+
+    function updateScore() {
+      document.getElementById("scoreBoard").textContent = "Score: " + score;
+    }
+
+    function showSecret() {
+      document.getElementById("secretBox").classList.remove("hidden");
+    }
+
+    // Typewriter Effect
+    const intro = document.getElementById("introText");
+    const introText = intro.textContent;
+    intro.textContent = "";
+    let i = 0;
+    function typeWriter() {
+      if (i < introText.length) {
+        intro.textContent += introText.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50);
+      }
+    }
+    typeWriter();
+
+    // Secret Code Unlock
+    let typedCode = "";
+    document.addEventListener("keydown", (e) => {
+      typedCode += e.key;
+      if (typedCode.includes("1443")) {
+        document.getElementById("codeBox").classList.remove("hidden");
+        typedCode = "";
+      }
+    });
+
+    // Particle Stars Background
+    const canvas = document.getElementById("starCanvas");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 100; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 2,
+          speed: Math.random() * 0.5 + 0.2
+        });
+      }
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+      });
+      requestAnimationFrame(animateStars);
+    }
+
+    createStars();
+    animateStars();
+
+    // Default theme
+    document.documentElement.setAttribute("data-theme", "dark");
+  </script>
+
+</body>
+</html>
